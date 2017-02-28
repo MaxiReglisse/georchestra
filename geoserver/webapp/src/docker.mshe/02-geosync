@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+mkdir /mnt/geoserver_datadir/data
+
+mkdir /mnt/geoserver_datadir/data/geosync-ouvert
+mkdir /mnt/geoserver_datadir/data/geosync-restreint
+
+mkdir /mnt/geoserver_datadir/data/geosync-ouvert/geosync_shp_open
+mkdir /mnt/geoserver_datadir/data/geosync-restreint/geosync_shp_rsct
+
+chown -R jetty:jetty /mnt/geoserver_datadir/data
+
