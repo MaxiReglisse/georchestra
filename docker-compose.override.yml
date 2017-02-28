@@ -43,8 +43,16 @@ services:
 #      - smtp:rw
 
   geodata:
-    build: docker/ssh_data.mshe
-    image: mshe/ssh_data
+    build: docker/ssh_data
+    image: georchestra/ssh_data:latest
+    ports:
+      - "2222:22"
+    volumes:
+      - geoserver_geodata:/mnt/geoserver_geodata
+
+  geosync:
+    build: docker/geosync
+    image: mshe/geosync
     environment:
       - SERVER_URL=https://georchestra-docker.umrthema.univ-fcomte.fr
       - OCL_URL=https://owncloud-mshe.univ-fcomte.fr
@@ -56,10 +64,8 @@ services:
     cap_add:
       - SYS_ADMIN
     volumes:
-      - geoserver_geodata:/mnt/geoserver_geodata
       - geosync_home:/home
       - /dev/fuse:/dev/fuse
       - ./docker/ssl/DigiCertCA.crt:/usr/local/share/ca-certificates/DigiCertCA.crt:ro
     extra_hosts:
       - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.83"
-
