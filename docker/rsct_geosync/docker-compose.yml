@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  rsct_geosync:
+    container_name: mshe_rsct_geosync
+    image: mshe/rsct_geosync
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - geosync_home:/home
+      - /home/geosync/bin:/geosync
+      - /home/rsct_geosync/crontab:/crontab
+
+volumes:
+  geosync_home:
+    driver: local
+
+# docker run -d --name mshe_rsct_geosync_1 --privileged --cap-add=SYS_ADMIN -v /dev/fuse:/dev/fuse -v $(pwd)/crontab/rsct_geosync:/crontab -v /home/rsct_geosync:/home/geo_user -v /home/geosync/bin:/geosync -e TZ=Europe/Paris mshe/rsct_geosync
+

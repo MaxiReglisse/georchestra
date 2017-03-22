@@ -16,6 +16,8 @@ services:
   database:
     image: mshe/database
     build: postgresql.mshe
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=georchestra
       - POSTGRES_PASSWORD=georchestra
@@ -44,8 +46,12 @@ services:
       - geoserver_geodata:/mnt/geoserver_geodata
       - geoserver_tiles:/mnt/geoserver_tiles
     environment:
+      - TZ=Europe/Paris
+      - SERVER_URL=https://georchestra-dev.umrthema.univ-fcomte.fr
       - XMS=256M
       - XMX=8G
+    extra_hosts:
+      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.82"
 
   proxy:
     image: georchestra/security-proxy:latest
@@ -58,7 +64,8 @@ services:
       - XMS=256M
       - XMX=1G
     extra_hosts:
-      - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.83"
+      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.82"
+      - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
 
   cas:
     image: georchestra/cas:latest
