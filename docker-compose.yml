@@ -10,7 +10,8 @@ volumes:
   mapfishapp_uploads:
   extractorapp_extracts:
   geonetwork_datadir:
-  geosync_home:
+#  geosync_home:
+#  geosync_bin:
 
 services:
   database:
@@ -52,6 +53,8 @@ services:
       - XMX=8G
     extra_hosts:
       - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.82"
+      - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
+      - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.124"
 
   proxy:
     image: georchestra/security-proxy:latest
@@ -66,6 +69,7 @@ services:
     extra_hosts:
       - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.82"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
+      - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.124"
 
   cas:
     image: georchestra/cas:latest
