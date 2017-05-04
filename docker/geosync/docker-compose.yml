@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  open_geosync:
+    container_name: mshe_open_geosync
+    image: mshe/open_geosync
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - geosync_home:/home
+      - /home/geosync/bin:/geosync
+      - /home/open_geosync/crontab:/crontab
+
+volumes:
+  geosync_home:
+    driver: local
+
+# docker run -d --name mshe_open_geosync_1 --privileged --cap-add=SYS_ADMIN -v /dev/fuse:/dev/fuse -v $(pwd)/crontab/open_geosync:/crontab -v /home/open_geosync:/home/geo_user -v /home/geosync/bin:/geosync -e TZ=Europe/Paris mshe/open_geosync
+
