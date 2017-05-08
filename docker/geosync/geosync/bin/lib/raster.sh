@@ -5,7 +5,7 @@
 usage() { 
   echo "==> usage : "
   echo "source /lib/raster.sh"
-  echo "raster::publish -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -c coveragestore -b db -d dbuser [-v]"
+  echo "raster::publish -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -c coveragestore -t db_host -b db_name -d db_user [-v]"
   echo ""
   echo "1. convertit (une copie du) raster (-i input) en tiff, dans le système de coordonnées désiré (-e epsg, ex: 4326 pour WGS84 )"
   echo "2. publie le raster converti sous le nom (-o output=input)"
@@ -20,7 +20,7 @@ raster::publish() {
   } 
 
   usage() {
-    error "raster::publish: -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -c coveragestore -b db -d dbuser -h dbhost [-v]"
+    error "raster::publish: -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -c coveragestore [-v]"
   }
 
   local DIR
@@ -33,9 +33,9 @@ raster::publish() {
   # $(util::cleanName "./tic/tac toe.shp") -> tac_toe.shp #takes a filepath and returns a pretty name
   source "$DIR/util.sh"
 
-  local input output epsg login password url workspace coveragestore db dbuser dbhost verbose
+  local input output epsg login password url workspace coveragestore verbose
   local OPTIND opt
-  while getopts "i:o:e:l:p:u:w:c:b:d:vh" opt; do
+  while getopts "i:o:e:l:p:u:w:c:t:b:d:vh" opt; do
     # le : signifie que l'option attend un argument
     case $opt in
       i) input=$OPTARG ;;
@@ -46,9 +46,9 @@ raster::publish() {
       u) url=$OPTARG ;;
       w) workspace=$OPTARG ;;
       c) coveragestore=$OPTARG ;;
+      t) dbhost=$OPTARG ;;
       b) db=$OPTARG ;;
       d) dbuser=$OPTARG ;;
-      d) dbhost=$OPTARG ;;
       v) verbose=1 ;;
       *) usage ;;
     esac
@@ -218,49 +218,7 @@ raster::publish() {
 
   # NB: le dossier temporaire n'est pas supprimé : rm -R "$tmpdir"
 
-  # Recherche d'un style correspondant
-  cmd="curl --silent \
-                     -u ${login}:${password} \
-                     -XGET $url/geoserver/rest/styles.xml"
-          if [ $verbose ]; then
-            echo $cmd
-          fi
-
-          local tmpdir_styles=~/tmp/geosync_sld
-          rm -R "$tmpdir_styles"
-          mkdir -p "$tmpdir_styles"
-          output_xml="styles.xml"
-          touch "$tmpdir_styles/$output_xml"
-
-          xml=$(eval $cmd)
-          echo $xml
-          echo $xml > "$tmpdir_styles/$output_xml"
-
-          input="$tmpdir_styles/$output_xml"
-          itemsCount=$(xpath 'count(/styles/style)')
-
-          touch "$tmpdir_styles/styles_existants"
-          for (( i=1; i < $itemsCount + 1; i++ )); do
-            name=$(xpath '//styles/style['$i']/name/text()')
-            echo $name
-            echo $name >> "$tmpdir_styles/styles_existants"
-          done
-
-          while read line 
-          do
-            name=$line
-            if [[ "$output" == "${name}"* ]]; then
-              cmd="curl --silent \
-                         -u ${login}:${password} \
-                         -XPUT -H \"Content-type: text/xml\" \
-                         -d \"<layer><defaultStyle><name>${name}</name></defaultStyle></layer>\" \
-                         $url/geoserver/rest/layers/${workspace}:${output}"
-              echo $cmd
-              eval $cmd
-            fi
-          done < "$tmpdir_styles/styles_existants"
-
-
+  # l'assignation d'un style est faite ailleurs
 
 }
 

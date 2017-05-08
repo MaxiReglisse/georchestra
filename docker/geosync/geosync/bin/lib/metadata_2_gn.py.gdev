@@ -7,12 +7,16 @@
 import os
 import sys 
 
-def publish_2_gn(input, url, login, password, workspace, database_hostname, verbose):
+def publish_2_gn(input, url, login, password, workspace, dbhost, verbose):
 
     from cleanName import cleanName
     import owslib
 
+    print "dans metadata.publish_2_gn"
+
+    print "Travail de CleanName.py"
     output = cleanName(input, True)
+    print "Fin de CleanName.py"
     
     if verbose:
       print "input     : ", input
@@ -21,12 +25,12 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
       print "login     : ", login
       print "password  : ", password
       print "workspace : ", workspace
-      print "dbhost    : ", database_hostname
+      print "dbhost    : ", dbhost
 
     reload(sys)  
     sys.setdefaultencoding('utf8')
 
-    # aide au diagnostic : vérifie l'existence du fichier input
+    # aide au diagnostique : vérifie l'existence du fichier input
     if not os.path.isfile(input):
         sys.stderr.write("ERROR input file not found : " + input + "\n")
         return
@@ -65,20 +69,26 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
             print "Métadonnée de type ArcGIS à convertir"
             #  utilisation de saxonb pour traduire ArcGIS metadata => iso 19139
             import subprocess
-            saxon_input = "-s:" + input
+            saxon_input = "-s:" + home + "/owncloudsync/" + input
             print str(saxon_input) 
             saxon_xsl = "-xsl:" + xsl_path 
+            print str(saxon_xsl)
             saxon_output = "-o:" + tmpdir + "/sax_" +  output 
             print str(saxon_output)
             # saxonb-xslt requiert le package libsaxonb-java (apt install libsaxonb-java)
-            cmd = "saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output
-            # subprocess.call(["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output]) # semble poser problème selon l'environnement (docker, ansible...)
-            #cmd = ["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output]
-            #cmd = ' '.join([str(x) for x in cmd])
-            #print "saxonb cmd :", cmd
-            if verbose:
-                print "saxonb cmd :", cmd
-            subprocess.call(cmd)
+            #subprocess.call(["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output])
+            #try:
+            #    subprocess.check_call(["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output], shell=True, stderr=subprocess.STDOUT)
+            #except subprocess.CalledProcessError as e:
+            #    print "returncode : ", e.returncode
+            #    print "cmd        : ", e.cmd
+            #    print "output     : ", e.output
+
+            cmd = ["saxonb-xslt", "-t:on", saxon_input, saxon_xsl, saxon_output]
+            cmd = ' '.join([str(x) for x in cmd])
+            print "saxonb cmd :", cmd
+            subprocess.call(cmd, shell=True, stderr=subprocess.STDOUT)
+
             input = tmpdir + "/sax_" +  output # input = /home/georchestra-ouvert/tmp/geosync_metadata/sax_cc_jura_nord.shp.xml
             print input
             break
@@ -102,23 +112,24 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
  
     typename_csw = gmd + 'MD_Metadata'
 
-    balise_fileIdentifier = gmd + 'fileIdentifier'
-    for element in doc.getElementsByTagName(balise_fileIdentifier):
+    balise = gmd + 'fileIdentifier'
+    for element in doc.getElementsByTagName(balise):
         print 'fileIdentifier en cours de suppression'
         doc.documentElement.removeChild(element)
 
-    balise_DigitalTransferOptions = gmd + 'MD_DigitalTransferOptions'
-    test_digital = doc.getElementsByTagName(balise_DigitalTransferOptions)
+    balise = gmd + 'MD_DigitalTransferOptions'
 
-    if not test_digital :	# creation de l'arborescence nécessaire à la creation de la balise MD_DigitalTransferOptions
-        balise_dist = gmd + 'distributionInfo'
-        element_dist = doc.createElement(balise_dist)
-        balise_MD_dist = gmd + 'MD_Distribution'
-        element_MD_dist = doc.createElement(balise_MD_dist)
-        balise_transfert = gmd + 'transferOptions'
-        element_transfert = doc.createElement(balise_transfert)
-        balise_digital = gmd + 'MD_DigitalTransferOptions'
-        element_digital = doc.createElement(balise_digital)
+    test_digital = doc.getElementsByTagName(balise)
+
+    if not test_digital :	# creation de l'arborescence nécessaire à la creation de la  balise MD_DigitalTransferOptions
+        b_dist = gmd + 'distributionInfo'
+        element_dist = doc.createElement(b_dist)
+        b_MD_dist = gmd + 'MD_Distribution'
+        element_MD_dist = doc.createElement(b_MD_dist)
+        b_transfert = gmd + 'transferOptions'
+        element_transfert = doc.createElement(b_transfert)
+        b_digital = gmd + 'MD_DigitalTransferOptions'
+        element_digital = doc.createElement(b_digital)
         for element in doc.getElementsByTagName(typename_csw) : 
             print element.appendChild(element_dist)
             print element_dist.appendChild(element_MD_dist)
@@ -126,72 +137,46 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
             print element_transfert.appendChild(element_digital)
  
     # AJOUT DES NOEUDS DANS L'ARBRE !!!!
-    # pour faire apparaître le bouton "Visualiser" dans geonetwork
-    # dans <gmd:MD_DigitalTransferOptions>
-    # <gmd:onLine>
-    #     <gmd:CI_OnlineResource>
-    #         <gmd:linkage>
-    #             <gmd:URL>https://georchestra-mshe.univ-fcomte.fr/geoserver/ows?SERVICE=WMS&amp;</gmd:URL>
-    #         </gmd:linkage>
-    #         <gmd:protocol>
-    #             <gco:CharacterString>OGC:WMS-1.3.0-http-get-map</gco:CharacterString>
-    #         </gmd:protocol>
-    #         <gmd:name>
-    #             <gco:CharacterString>geosync-restreint:NOM_DE_LA_COUCHE</gco:CharacterString>
-    #         </gmd:name>
-    #         <gmd:description>
-    #             <gco:CharacterString>NOM_DE_LA_COUCHE</gco:CharacterString>
-    #         </gmd:description>
-    #     </gmd:CI_OnlineResource>
-    # </gmd:onLine>
 
-    balise_online = gmd + 'onLine'				# creation balise online
-    element_online = doc.createElement(balise_online)
-
-    balise_ressource = gmd + 'CI_OnlineResource'		# creation balise ressource
-    element_ressource = doc.createElement(balise_ressource)	
-
-    balise_linkage = gmd + 'linkage'				# creation balise linkage
-    element_linkage = doc.createElement(balise_linkage)
-
-    balise_url = gmd + 'URL'					# creation et remplissage balise url  
-    element_url = doc.createElement(balise_url)
-
-    url_wms = url + "/geoserver/ows?SERVICE=WMS&"		# url_wms = https://georchestra-dev.umrthema.univ-fcomte.fr/geoserver/ows?SERVICE=WMS&
+    b_online = gmd + 'onLine'				# creation balise online
+    element_online = doc.createElement(b_online)
+    b_ressource = gmd + 'CI_OnlineResource'		# creation balise ressource
+    element_ressource = doc.createElement(b_ressource)	
+    b_linkage = gmd + 'linkage'				# creation balise linkage
+    element_linkage = doc.createElement(b_linkage)
+    b_url = gmd + 'URL'					# creation et remplissage balise url  
+    element_url = doc.createElement(b_url)
+    url_wms = url + "/geoserver/ows?SERVICE=WMS&"	# url_wms = https://georchestra-dev.umrthema.univ-fcomte.fr/geoserver/ows?SERVICE=WMS&
+    print "url_wms :", url_wms
     element_url_txt = doc.createTextNode(url_wms)
     element_url.appendChild(element_url_txt)
-
-    balise_protocol = gmd + 'protocol'				# creation et remplissage balise protocole
-    element_protocol = doc.createElement(balise_protocol)	
-
-    balise_gco = 'gco:CharacterString'
-    element_protocol_gco = doc.createElement(balise_gco)
+    b_protocol = gmd + 'protocol'				# creation et remplissage balise protocole
+    element_protocol = doc.createElement(b_protocol)	
+    b_gco = 'gco:CharacterString'
+    element_protocol_gco = doc.createElement(b_gco)
     element_protocol.appendChild(element_protocol_gco)
     #element_protocol_txt = doc.createTextNode(u"OGC:WMS-1.3.0-http-get-capabilities")
     element_protocol_txt = doc.createTextNode(u"OGC:WMS-1.3.0-http-get-map")
     element_protocol_gco.appendChild(element_protocol_txt)    
-
-    balise_name = gmd + u'name'					# creation et remplissage balise name
-    element_name = doc.createElement(balise_name)
-
-    balise_gco = 'gco:CharacterString'
-    element_name_gco = doc.createElement(balise_gco)
-    element_protocol_gco = doc.createElement(balise_gco)
+    b_name = gmd + u'name'					# creation et remplissage balise name
+    element_name = doc.createElement(b_name)
+    b_gco = 'gco:CharacterString'
+    element_name_gco = doc.createElement(b_gco)
     element_name.appendChild(element_name_gco)
-
-    name_layer_gs = workspace + ":" + output.split(".")[0]	# name_layer_gs = geosync-restreint:baies_metadata__baies_metadata
+    name_layer_gs = workspace + ":" + output.split(".")[0]		# name_layer_gs = geosync-restreint:baies_metadata__baies_metadata
     element_name_txt = doc.createTextNode(name_layer_gs)
     element_name_gco.appendChild(element_name_txt)
-    balise_descr = gmd +'description'				# creation et remplissage balise description
-    element_descr = doc.createElement(balise_descr)
-
-    balise_gco = 'gco:CharacterString'
-    element_descr_gco = doc.createElement(balise_gco)
+    b_descr = gmd +'description'				# creation et remplissage balise description
+    element_descr = doc.createElement(b_descr)
+    b_gco = 'gco:CharacterString'
+    element_descr_gco = doc.createElement(b_gco)
     element_descr.appendChild(element_descr_gco)
     element_descr_txt = doc.createTextNode(output.split(".")[0])   #baies_metadata__baies_metadata      #u"baies_metadata__baies_metadataéééééééééé"
     element_descr_gco.appendChild(element_descr_txt)
 
-    for element in doc.getElementsByTagName(balise_DigitalTransferOptions):
+    print "balise :", balise
+ 
+    for element in doc.getElementsByTagName(balise):
         print element.appendChild(element_online)
         print element_online.appendChild(element_ressource)
         print element_ressource.appendChild(element_linkage)
@@ -202,22 +187,21 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
 
     input_csw = tmpdir + "/csw_" +  output
     output_fic = open(input_csw,'w') 
+    print "ouverture de :", output_fic
+
     txt = doc.toxml().encode('utf-8','ignore')
     output_fic.write(txt)
     output_fic.close()
-    print "création du fichier temporaire csw_ :", input_csw
+    print "fermeture de :", output_fic
 
     # Connect to a CSW, and inspect its properties:
-    print "connexion au geonetwork"
     from owslib.csw import CatalogueServiceWeb
     #csw = CatalogueServiceWeb(url, skip_caps=True, username=login, password=password)
     url_csw = url + "/geonetwork/srv/fre/csw-publication"
-    # Attention : l'utilisateur (login) doit avoir le rôle GN_EDITOR (ou GN_ADMIN) (anciennement SV_EDITOR / SV_ADMIN) voir administration ldap
-    #csw = CatalogueServiceWeb(url_csw, skip_caps=True, username=login, password=password)
-    csw = CatalogueServiceWeb('https://georchestra-docker.umrthema.univ-fcomte.fr/geonetwork/srv/fre/csw-publication', skip_caps=True, username='testadmin', password='testadmin')
+    csw = CatalogueServiceWeb(url_csw, skip_caps=True, username=login, password=password)
+    #csw = CatalogueServiceWeb('https://georchestra-dev.umrthema.univ-fcomte.fr/geonetwork/srv/fre/csw-publication', skip_caps=True, username='testadmin', password='testadmin')
     
     # suppression des métadonnées relatives à la même couche geoserver
-    print "suppression des métadonnées"
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike
     myquery = PropertyIsEqualTo('csw:AnyText',name_layer_gs)
     csw.getrecords2(constraints=[myquery], maxrecords=10)
@@ -230,6 +214,7 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     # Transaction: insert
     #typename_csw = gmd + 'MD_Metadata' # FAIT PLUS HAUT, JUSTE APRES DETERMINATION GMD OU PAS
     #print typename_csw
+    print input_csw
 
     #import unicodedata
     #acc = open(input_csw).read()
@@ -237,7 +222,6 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     #acc_d = acc.decode('utf-8')
     #acc_8 = unicodedata.normalize('NFKD',acc_d).encode('ascii', 'ignore')	# nécessite unicodedata, supprime les accents
 
-    print "insertion dans geonetwork"
     csw.transaction(ttype='insert', typename=typename_csw, record=open(input_csw).read())
     #csw.transaction(ttype='insert', typename=typename_csw, record=acc_8)
     #csw.transaction(ttype='insert', typename='gmd:MD_Metadata', record=open('haies_sans_lien_geoserver.xml').read())
@@ -267,15 +251,12 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
 
     sql_req = "set schema 'geonetwork';  INSERT INTO operationallowed SELECT 1, metadata.id, 1 FROM metadata WHERE data ILIKE '%" + name_layer_gs + "%' ; INSERT INTO operationallowed SELECT 1, metadata.id, 5 FROM metadata WHERE data ILIKE '%" + name_layer_gs + "%' ; INSERT INTO operationallowed SELECT 1, metadata.id, 0 FROM metadata WHERE data ILIKE '%" + name_layer_gs + "%' AND NOT EXISTS (SELECT * FROM operationallowed JOIN metadata ON operationallowed.metadataid = metadata.id WHERE data ILIKE '%" + name_layer_gs + "%' AND operationid = 0) ; "
 
-    print "sql_req :", sql_req 
+    print sql_req 
     sql_file_name = tmpdir + "/update_privilege.sql"
     sql_file = open(sql_file_name,"w")
     sql_file.write(sql_req)
     sql_file.close()
-    cmd = "psql -h " + database_hostname + " -d georchestra -U geonetwork -w -a -f " + sql_file_name
-    if verbose:
-                print "sql cmd :", cmd
-    #os.system(cmd)
+    os.system("psql -h " + dbhost + " -d georchestra -U geonetwork -w -a -f " + sql_file_name)
 
 # test de la fonction publish_2_gn
 if __name__ == "__main__":
@@ -283,22 +264,22 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(add_help=True)
-    #parser.add_argument('-i',          action="store",      dest="input",              required=True)
-    parser.add_argument('-i',           action="store",      dest="input",              default="metadata_no_uid.xml")
-    #parser.add_argument('-l',          action="store",      dest="login",              required=True)
-    parser.add_argument('-l',           action="store",      dest="login",              default="admin")
-    parser.add_argument('-o',           action="store",      dest="output"                 )
-    #parser.add_argument('-p',          action="store",      dest="password",           required=True)
-    parser.add_argument('-p',           action="store",      dest="password",           default="admin")
-    parser.add_argument('-s',           action="store",      dest="datastore"              )
-    parser.add_argument('-u',           action="store",      dest="url",                default="http://geonetwork-mshe.univ-fcomte.fr:8080/geonetwork/srv/fre/csw-publication")
-    parser.add_argument('-v',           action="store_true", dest="verbose",            default=False)
-    parser.add_argument('-w',           action="store",      dest="workspace",          default="geosync-ouvert")
-    parser.add_argument('--db_hostname',action="store",      dest="database_hostname",  default="localhost")
+    #parser.add_argument('-i', action="store",      dest="input",    required=True)
+    parser.add_argument('-i',       action="store",      dest="input",     default="metadata_no_uid.xml")
+    #parser.add_argument('-l', action="store",      dest="login",    required=True)
+    parser.add_argument('-l',       action="store",      dest="login",     default="admin")
+    parser.add_argument('-o',       action="store",      dest="output"                 )
+    #parser.add_argument('-p', action="store",      dest="password", required=True)
+    parser.add_argument('-p',       action="store",      dest="password",  default="admin")
+    parser.add_argument('-s',       action="store",      dest="datastore"              )
+    parser.add_argument('-u',       action="store",      dest="url"     ,  default="http://geonetwork-mshe.univ-fcomte.fr:8080/geonetwork/srv/fre/csw-publication")
+    parser.add_argument('-v',       action="store_true", dest="verbose",   default=False)
+    parser.add_argument('-w',       action="store",      dest="workspace", default="geosync-ouvert")
+    parser.add_argument('--db_hostname', action="store",      dest="dbhost",    default="localhost")
 
     args = parser.parse_args()
     print parser.parse_args()
 
     if args.input:
-        publish_2_gn(args.input, args.url, args.login, args.password, args.workspace, args.database_hostname, args.verbose)
+        publish_2_gn(args.input, args.url, args.login, args.password, args.workspace, args.dbhost, args.verbose)
 

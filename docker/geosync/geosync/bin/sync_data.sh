@@ -33,7 +33,7 @@ fi
   date >> $LOG_PATH/publish.log
   date >> $LOG_PATH/publish_error.log
 
-  cmd="bash '${SCRIPT_PATH}/publish.sh' -i '$INPUT_COPY_PATH' -d '$DATA_PATH' -p '$PARAMFILE' 1>>'$LOG_PATH/publish.log' 2>>'$LOG_PATH/publish_error.log'"
+  cmd="bash '${SCRIPT_PATH}/publish.sh' -v -i '$INPUT_COPY_PATH' -d '$DATA_PATH' -p '$PARAMFILE' 1>>'$LOG_PATH/publish.log' 2>>'$LOG_PATH/publish_error.log'"
   #echo $cmd
   eval $cmd
 

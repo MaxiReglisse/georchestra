@@ -6,6 +6,6 @@
 #echo "starting saslauthd"
 /etc/init.d/saslauthd start
 
-echo "starting ldap"
+echo "Starting slapd"
 exec slapd -d 32768 -u openldap -g openldap
 

@@ -2,17 +2,24 @@
 
 echo "Setting saslauth files for LDAP"
 
-# /etc/ldap/ldap.conf
-perl -p -i -e "s/dc=georchestra,dc=org/${SLAPD_DC_STRING}/" /tmp/LDAP/ldap.conf
-cp /tmp/LDAP/ldap.conf  /etc/ldap/ldap.conf
+# test if already initialized
+if [ ! -d /etc/ldap/slapd.d ]; then
 
-# /etc/ldap/sasl2/slapd.conf
-cp /tmp/LDAP/slapd.conf /etc/ldap/sasl2/slapd.conf
+    # /etc/ldap/ldap.conf
+    perl -p -i -e "s/dc=georchestra,dc=org/${SLAPD_DC_STRING}/" /tmp/LDAP/ldap.conf
+    cp /tmp/LDAP/ldap.conf  /etc/ldap/ldap.conf
 
-# /etc/saslauthd.conf
-perl -p -i -e "s/dc=ad,dc=georchestra,dc=org/${AD_DC_STRING}/" /etc/saslauthd.conf
-perl -p -i -e "s/ad-server.georchestra.org/${AD_SERVER}/"      /etc/saslauthd.conf
-perl -p -i -e "s/ad_secret/${AD_PASSWORD}/"                    /etc/saslauthd.conf
+    # /etc/ldap/sasl2/slapd.conf
+    cp /tmp/LDAP/slapd.conf /etc/ldap/sasl2/slapd.conf
+
+    # /etc/saslauthd.conf
+    perl -p -i -e "s/dc=ad,dc=georchestra,dc=org/${AD_DC_STRING}/" /etc/saslauthd.conf
+    perl -p -i -e "s/ad-server.georchestra.org/${AD_SERVER}/"      /etc/saslauthd.conf
+    perl -p -i -e "s/ad_secret/${AD_PASSWORD}/"                    /etc/saslauthd.conf
+
+else
+    echo "LDAP already configured !"
+fi
 
 # /root/ad2ldap_sync.py
 echo "Template ad2ldap_sync.py"

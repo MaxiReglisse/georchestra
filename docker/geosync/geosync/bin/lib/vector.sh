@@ -5,7 +5,7 @@
 usage() { 
   echo "==> usage : "
   echo "source /lib/vector.sh"
-  echo "vector::publish -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -s datastore -g pg_datastore -b db -d dbuser [-v]"
+  echo "vector::publish -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -s datastore -g pg_datastore -t db_host -b db_name -d db_user [-v]"
   echo ""
   echo "1. convertit (une copie du) shapefile (-i input) dans le système de coordonnées désiré (-e epsg)"
   echo "2. publie le shapefile converti sous le nom (-o output=input)"
@@ -20,7 +20,7 @@ vector::publish() {
   } 
 
   usage() {
-    echoerror "vector::publish: -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -s datastore -g pg_datastore -b db -d dbuser -h dbhost [-v]"
+    echoerror "vector::publish: -i input [-o output=input] [-e epsg=2154] -l login -p password -u url -w workspace -s datastore -g pg_datastore -b db -d dbuser [-v]"
   }
 
   #echo if verbose=1
@@ -49,9 +49,9 @@ vector::publish() {
   # $(util::cleanName "./tic/tac toe.shp") -> tac_toe.shp #takes a filepath and returns a pretty name
   source "$DIR/util.sh"
 
-  local input output epsg login password url workspace datastore pg_datastore db dbuser dbhost verbose
+  local input output epsg login password url workspace datastore verbose
   local OPTIND opt
-  while getopts "i:o:e:l:p:u:w:s:g:b:d:h:v" opt; do
+  while getopts "i:o:e:l:p:u:w:s:g:t:b:d:vh" opt; do
     # le : signifie que l'option attend un argument
     case $opt in
       i) input=$OPTARG ;;
@@ -63,9 +63,9 @@ vector::publish() {
       w) workspace=$OPTARG ;;
       s) datastore=$OPTARG ;;
       g) pg_datastore=$OPTARG ;;
+      t) dbhost=$OPTARG ;;
       b) db=$OPTARG ;;
       d) dbuser=$OPTARG ;;
-      h) dbhost=$OPTARG ;;
       v) verbose=1 ;;
       *) usage ;;
     esac
@@ -162,18 +162,30 @@ vector::publish() {
 
   encoding="UTF-8"
   
-  cpg_found=($(find "${filepath}" -maxdepth 1 -iname "${filename}.cpg"))
+  # retrouve le(s) fichier(s) cpg correspondant(s), indépendament de la casse, voir http://stackoverflow.com/questions/23356779/how-can-i-store-find-command-result-as-arrays-in-bash
+  cpg_found=()
+  while IFS=  read -r -d $'\0'; do
+      cpg_found+=("$REPLY")
+  done < <(find "${filepath}" -maxdepth 1 -iname "${filename}.cpg" -print0)
+  #cpg_found=($(find "${filepath}" -maxdepth 1 -iname "${filename}.cpg")) ## Attention : ne marche pas avec des espaces dans le chemin/nom
   if [ ${#cpg_found[@]} -gt 0 ]; then  # ne pas utiliser [ -n $cpg_found ] comme c'est un array
-    echo "cpg existe $cpg_found"
+    echo_ifverbose "INFO cpg existe : ${cpg_found[0]}"
   	encoding=$(cat "${cpg_found[0]}") # contenu du fichier .cpg, par exemple "UTF-8"
   else
-	echo "cpg n'existe PAS"
-    dbf_found=($(find "${filepath}" -maxdepth 1 -iname "${filename}.dbf"))
+	  echo_ifverbose "INFO cpg n'existe PAS"
+    # retrouve le(s) fichier(s) dbf correspondant(s), indépendament de la casse, voir http://stackoverflow.com/questions/23356779/how-can-i-store-find-command-result-as-arrays-in-bash
+    dbf_found=()
+    while IFS=  read -r -d $'\0'; do
+        dbf_found+=("$REPLY")
+    done < <(find "${filepath}" -maxdepth 1 -iname "${filename}.dbf" -print0)
+    #dbf_found=($(find "${filepath}" -maxdepth 1 -iname "${filename}.dbf")) ## Attention : ne marche pas avec des espaces dans le chemin/nom
     if [ ${#dbf_found[@]} -gt 0 ]; then # ne pas utiliser [ -n $dbf_found ] comme c'est un array
-      echo "dbf existe $dbf_found "
+      echo_ifverbose "INFO dbf existe : ${dbf_found[0]}"
       #exemple de sortie de dbview foo.dbf | file -i -
       #/dev/stdin: text/plain; charset=iso-8859-1
-      encoding=$(dbview "${dbf_found[0]}" | file -i - | cut -d= -f2)  # charset du fichier .dbf, par exemple "ISO-8859-1" ou encore "UTF-8"
+      cmd="dbview \"${dbf_found[0]}\" | file -i - | cut -d= -f2"  # charset du fichier .dbf, par exemple "ISO-8859-1" ou encore "UTF-8"
+      echo_ifverbose "INFO ${cmd}"
+      encoding=$(eval ${cmd})
 
       # avec encoding=unknown-8bit on obtient l'erreur suivante :
       # Unable to convert field name to UTF-8 (iconv reports "Argument invalide"). Current encoding is "unknown-8bit". Try "LATIN1" (Western European), or one of the values described at http://www.gnu.org/software/libiconv/
@@ -182,19 +194,19 @@ vector::publish() {
         encoding="LATIN1"
       fi
     else
-	  echo "dbf n'existe PAS"
+	  echo_ifverbose "INFO dbf n'existe PAS"
 	fi
   fi
    
-  echo "encoding $encoding"
+  echo_ifverbose "INFO encoding $encoding"
   
   # convertit le système de coordonnées du shapefile
   # attention : ne pas mettre le résultat directement dans le répertoire du datastore (data_dir) du Geoserver (l'appel à l'API rest s'en charge)
   echo_ifverbose "INFO convertit le shapefile (système de coordonnées) avec ogr2ogr"
-  cmd="ogr2ogr -t_srs EPSG:$epsg -overwrite -skipfailures $tmpdir/$output $input"
+  cmd="ogr2ogr -t_srs 'EPSG:${epsg}' -overwrite -skipfailures '${tmpdir}/${output}' '${input}'"
   echo_ifverbose "INFO ${cmd}"
 
-  eval ${cmd}
+  result=$(eval ${cmd})
   # ogr2ogr -t_srs "EPSG:$epsg" -lco ENCODING=${encoding} -overwrite -skipfailures "$tmpdir/$output" "$input"
   #-lco ENCODING=ISO-8859-1  # correspond à LATIN1
   # attention : le datastore doit être en UTF-8
@@ -210,14 +222,14 @@ vector::publish() {
   layer=$(echo $output | cut -d. -f1) # TODO envisager de supprimer les points et non de prendre avant un point pour diminuer le risque de colision avec une autre table
 
   echo_ifverbose "INFO envoi du shapefile vers PostGIS"
-  cmd="shp2pgsql -I -W ${encoding} -s 2154 -D -d //${tmpdir}/${output} ${layer} | sed -e 's/DROP TABLE/DROP TABLE IF EXISTS/' | psql -h ${dbhost} -d ${db} -U ${dbuser} -w 1>/dev/null"
+  cmd="shp2pgsql -I -W '${encoding}' -s 2154 -D -d '//${tmpdir}/${output}' '${layer}' | sed -e 's/DROP TABLE/DROP TABLE IF EXISTS/' | psql -h '${dbhost}' -d '${db}' -U '${dbuser}' -w"
   # -D  Use  the PostgreSQL "dump" format for the output data. much faster to load than the default "insert" SQL format. Use this for very large data sets.
   # -d  Drops the table, then recreates it # attention : génére une erreur (à tord) si n'existe pas déjà 
   # ERREUR:  la table « ... » n'existe pas
   # pour éviter d'avoir une erreur, on substitue le DROP TABLE par un DROP TABLE IF EXISTS  # | sed -e "s/DROP TABLE/DROP TABLE IF EXISTS/" |
   echo_ifverbose "INFO ${cmd}"
 
-  eval $cmd
+  result=$(eval ${cmd})
 
   # récupére la couche si elle existe
   echo_ifverbose "INFO vérifie l'existance du vecteur ${layer}"
