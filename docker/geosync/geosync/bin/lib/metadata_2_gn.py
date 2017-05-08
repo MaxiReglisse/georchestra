@@ -214,7 +214,8 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     url_csw = url + "/geonetwork/srv/fre/csw-publication"
     # Attention : l'utilisateur (login) doit avoir le rôle GN_EDITOR (ou GN_ADMIN) (anciennement SV_EDITOR / SV_ADMIN) voir administration ldap
     #csw = CatalogueServiceWeb(url_csw, skip_caps=True, username=login, password=password)
-    csw = CatalogueServiceWeb('https://georchestra-docker.umrthema.univ-fcomte.fr/geonetwork/srv/fre/csw-publication', skip_caps=True, username='testadmin', password='testadmin')
+    csw = CatalogueServiceWeb(url_csw, skip_caps=True, username='testadmin', password='testadmin')
+    #csw = CatalogueServiceWeb('https://georchestra-dev.umrthema.univ-fcomte.fr/geonetwork/srv/fre/csw-publication', skip_caps=True, username='testadmin', password='testadmin')
     
     # suppression des métadonnées relatives à la même couche geoserver
     print "suppression des métadonnées"

@@ -3,11 +3,11 @@
 # Fail on errors
 set -e
 
+echo "Updating /etc/ssl/certs and ca-certificates.crt"
+/usr/sbin/update-ca-certificates
+
 # test if already initialized
 if [ ! -d /var/log/georchestra-ouvert ]; then
-
-    echo "Updating /etc/ssl/certs and ca-certificates.crt"
-    /usr/sbin/update-ca-certificates
 
     echo "Crontab for georchestra-ouvert"
     cp /home/georchestra-ouvert/crontab/georchestra-ouvert /var/spool/cron/crontabs/georchestra-ouvert
