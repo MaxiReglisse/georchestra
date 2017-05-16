@@ -17,6 +17,8 @@ services:
   database:
     image: mshe/database
     build: postgresql.mshe
+    #image: georchestra/database
+    #build: postgresql
     ports:
       - "5432:5432"
     environment:
@@ -28,6 +30,8 @@ services:
   ldap:
     image: mshe/ldap
     build: ldap.mshe
+    #image: georchestra/ldap
+    #build: ldap
     environment:
         - SLAPD_ORGANISATION=georchestra
         - SLAPD_DOMAIN=georchestra.org
@@ -36,10 +40,14 @@ services:
     volumes:
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap
+    extra_hosts:
+      - "thema-serv3.umrthema.univ-fcomte.fr:172.20.74.170"
 
   geoserver:
     image: mshe/geoserver
     build: geoserver/webapp/src/docker.mshe
+    #image: georchestra/geoserver
+    #build: geoserver/webapp/src/docker
     depends_on:
       - ldap
     volumes:
