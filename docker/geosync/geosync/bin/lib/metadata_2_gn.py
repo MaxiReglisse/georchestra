@@ -14,14 +14,14 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
 
     output = cleanName(input, True)
     
-    if verbose:
-      print "input     : ", input
-      print "output    : ", output
-      print "url       : ", url
-      print "login     : ", login
-      print "password  : ", password
-      print "workspace : ", workspace
-      print "dbhost    : ", database_hostname
+    # if verbose:
+    #   print "input     : ", input
+    #   print "output    : ", output
+    #   print "url       : ", url
+    #   print "login     : ", login
+    #   print "password  : ", password
+    #   print "workspace : ", workspace
+    #   print "dbhost    : ", database_hostname
 
     reload(sys)  
     sys.setdefaultencoding('utf8')
@@ -48,7 +48,6 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
         os.mkdir(tmpdir) 
 
     # Translate Esri metadata to ISO19139
-    # ATTENTION ce code semble ne pas marcher (lxml.etree.XMLSyntaxError)
 
     # aide au diagnostique : vérifie la présence de ArcGIS2ISO19139.xsl
     script_path = os.path.dirname(os.path.abspath(__file__))
@@ -73,9 +72,6 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
             # saxonb-xslt requiert le package libsaxonb-java (apt install libsaxonb-java)
             cmd = "saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output
             # subprocess.call(["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output]) # semble poser problème selon l'environnement (docker, ansible...)
-            #cmd = ["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output]
-            #cmd = ' '.join([str(x) for x in cmd])
-            #print "saxonb cmd :", cmd
             if verbose:
                 print "saxonb cmd :", cmd
             subprocess.call(cmd)
@@ -102,23 +98,24 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
  
     typename_csw = gmd + 'MD_Metadata'
 
-    balise_fileIdentifier = gmd + 'fileIdentifier'
-    for element in doc.getElementsByTagName(balise_fileIdentifier):
+    balise = gmd + 'fileIdentifier'
+    for element in doc.getElementsByTagName(balise):
         print 'fileIdentifier en cours de suppression'
         doc.documentElement.removeChild(element)
 
-    balise_DigitalTransferOptions = gmd + 'MD_DigitalTransferOptions'
-    test_digital = doc.getElementsByTagName(balise_DigitalTransferOptions)
+    b_DigitalTransferOptions = gmd + 'MD_DigitalTransferOptions'
 
-    if not test_digital :	# creation de l'arborescence nécessaire à la creation de la balise MD_DigitalTransferOptions
-        balise_dist = gmd + 'distributionInfo'
-        element_dist = doc.createElement(balise_dist)
-        balise_MD_dist = gmd + 'MD_Distribution'
-        element_MD_dist = doc.createElement(balise_MD_dist)
-        balise_transfert = gmd + 'transferOptions'
-        element_transfert = doc.createElement(balise_transfert)
-        balise_digital = gmd + 'MD_DigitalTransferOptions'
-        element_digital = doc.createElement(balise_digital)
+    test_digital = doc.getElementsByTagName(b_DigitalTransferOptions)
+
+    if not test_digital :	# creation de l'arborescence nécessaire à la creation de la  balise MD_DigitalTransferOptions
+        b_dist = gmd + 'distributionInfo'
+        element_dist = doc.createElement(b_dist)
+        b_MD_dist = gmd + 'MD_Distribution'
+        element_MD_dist = doc.createElement(b_MD_dist)
+        b_transfert = gmd + 'transferOptions'
+        element_transfert = doc.createElement(b_transfert)
+        b_digital = gmd + 'MD_DigitalTransferOptions'
+        element_digital = doc.createElement(b_digital)
         for element in doc.getElementsByTagName(typename_csw) : 
             print element.appendChild(element_dist)
             print element_dist.appendChild(element_MD_dist)
@@ -145,53 +142,45 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     #     </gmd:CI_OnlineResource>
     # </gmd:onLine>
 
-    balise_online = gmd + 'onLine'				# creation balise online
-    element_online = doc.createElement(balise_online)
-
-    balise_ressource = gmd + 'CI_OnlineResource'		# creation balise ressource
-    element_ressource = doc.createElement(balise_ressource)	
-
-    balise_linkage = gmd + 'linkage'				# creation balise linkage
-    element_linkage = doc.createElement(balise_linkage)
-
-    balise_url = gmd + 'URL'					# creation et remplissage balise url  
-    element_url = doc.createElement(balise_url)
-
-    url_wms = url + "/geoserver/ows?SERVICE=WMS&"		# url_wms = https://georchestra-dev.umrthema.univ-fcomte.fr/geoserver/ows?SERVICE=WMS&
+    b_online = gmd + 'onLine'				# creation balise online
+    element_online = doc.createElement(b_online)
+    b_ressource = gmd + 'CI_OnlineResource'		# creation balise ressource
+    element_ressource = doc.createElement(b_ressource)	
+    b_linkage = gmd + 'linkage'				# creation balise linkage
+    element_linkage = doc.createElement(b_linkage)
+    b_url = gmd + 'URL'					# creation et remplissage balise url  
+    element_url = doc.createElement(b_url)
+    url_wms = url + "/geoserver/ows?SERVICE=WMS&"	# url_wms = https://georchestra-dev.umrthema.univ-fcomte.fr/geoserver/ows?SERVICE=WMS&
+    print url_wms
     element_url_txt = doc.createTextNode(url_wms)
     element_url.appendChild(element_url_txt)
-
-    balise_protocol = gmd + 'protocol'				# creation et remplissage balise protocole
-    element_protocol = doc.createElement(balise_protocol)	
-
-    balise_gco = 'gco:CharacterString'
-    element_protocol_gco = doc.createElement(balise_gco)
+    b_protocol = gmd + 'protocol'				# creation et remplissage balise protocole
+    element_protocol = doc.createElement(b_protocol)	
+    b_gco = 'gco:CharacterString'
+    element_protocol_gco = doc.createElement(b_gco)
     element_protocol.appendChild(element_protocol_gco)
     #element_protocol_txt = doc.createTextNode(u"OGC:WMS-1.3.0-http-get-capabilities")
     element_protocol_txt = doc.createTextNode(u"OGC:WMS-1.3.0-http-get-map")
     element_protocol_gco.appendChild(element_protocol_txt)    
-
-    balise_name = gmd + u'name'					# creation et remplissage balise name
-    element_name = doc.createElement(balise_name)
-
-    balise_gco = 'gco:CharacterString'
-    element_name_gco = doc.createElement(balise_gco)
-    element_protocol_gco = doc.createElement(balise_gco)
+    b_name = gmd + u'name'					# creation et remplissage balise name
+    element_name = doc.createElement(b_name)
+    b_gco = 'gco:CharacterString'
+    element_name_gco = doc.createElement(b_gco)
     element_name.appendChild(element_name_gco)
-
-    name_layer_gs = workspace + ":" + output.split(".")[0]	# name_layer_gs = geosync-restreint:baies_metadata__baies_metadata
+    name_layer_gs = workspace + ":" + output.split(".")[0]		# name_layer_gs = geosync-restreint:baies_metadata__baies_metadata
     element_name_txt = doc.createTextNode(name_layer_gs)
     element_name_gco.appendChild(element_name_txt)
-    balise_descr = gmd +'description'				# creation et remplissage balise description
-    element_descr = doc.createElement(balise_descr)
-
-    balise_gco = 'gco:CharacterString'
-    element_descr_gco = doc.createElement(balise_gco)
+    b_descr = gmd +'description'				# creation et remplissage balise description
+    element_descr = doc.createElement(b_descr)
+    b_gco = 'gco:CharacterString'
+    element_descr_gco = doc.createElement(b_gco)
     element_descr.appendChild(element_descr_gco)
     element_descr_txt = doc.createTextNode(output.split(".")[0])   #baies_metadata__baies_metadata      #u"baies_metadata__baies_metadataéééééééééé"
     element_descr_gco.appendChild(element_descr_txt)
 
-    for element in doc.getElementsByTagName(balise_DigitalTransferOptions):
+    print b_DigitalTransferOptions
+ 
+    for element in doc.getElementsByTagName(b_DigitalTransferOptions):
         print element.appendChild(element_online)
         print element_online.appendChild(element_ressource)
         print element_ressource.appendChild(element_linkage)
@@ -205,20 +194,17 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     txt = doc.toxml().encode('utf-8','ignore')
     output_fic.write(txt)
     output_fic.close()
-    print "création du fichier temporaire csw_ :", input_csw
 
     # Connect to a CSW, and inspect its properties:
-    print "connexion au geonetwork"
     from owslib.csw import CatalogueServiceWeb
     #csw = CatalogueServiceWeb(url, skip_caps=True, username=login, password=password)
     url_csw = url + "/geonetwork/srv/fre/csw-publication"
     # Attention : l'utilisateur (login) doit avoir le rôle GN_EDITOR (ou GN_ADMIN) (anciennement SV_EDITOR / SV_ADMIN) voir administration ldap
-    #csw = CatalogueServiceWeb(url_csw, skip_caps=True, username=login, password=password)
-    csw = CatalogueServiceWeb(url_csw, skip_caps=True, username='testadmin', password='testadmin')
+    ## sinon peut générer l'erreur : lxml.etree.XMLSyntaxError: Opening and ending tag mismatch
+    csw = CatalogueServiceWeb(url_csw, skip_caps=True, username=login, password=password)
     #csw = CatalogueServiceWeb('https://georchestra-dev.umrthema.univ-fcomte.fr/geonetwork/srv/fre/csw-publication', skip_caps=True, username='testadmin', password='testadmin')
     
     # suppression des métadonnées relatives à la même couche geoserver
-    print "suppression des métadonnées"
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike
     myquery = PropertyIsEqualTo('csw:AnyText',name_layer_gs)
     csw.getrecords2(constraints=[myquery], maxrecords=10)
@@ -231,6 +217,7 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     # Transaction: insert
     #typename_csw = gmd + 'MD_Metadata' # FAIT PLUS HAUT, JUSTE APRES DETERMINATION GMD OU PAS
     #print typename_csw
+    print input_csw
 
     #import unicodedata
     #acc = open(input_csw).read()
@@ -238,17 +225,17 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     #acc_d = acc.decode('utf-8')
     #acc_8 = unicodedata.normalize('NFKD',acc_d).encode('ascii', 'ignore')	# nécessite unicodedata, supprime les accents
 
-    print "insertion dans geonetwork"
     csw.transaction(ttype='insert', typename=typename_csw, record=open(input_csw).read())
     #csw.transaction(ttype='insert', typename=typename_csw, record=acc_8)
     #csw.transaction(ttype='insert', typename='gmd:MD_Metadata', record=open('haies_sans_lien_geoserver.xml').read())
 
     # Modification des privilèges d'une fiche de metadata pour pouvoir voir sa carte interactive / voir son lien de téléchargement des données :
     # doc : http://geonetwork-opensource.org/manuals/trunk/eng/users/user-guide/publishing/managing-privileges.html
-
+  
     # via l'interface web : https://georchestra-mshe.univ-fcomte.fr/geonetwork/srv/fre/catalog.edit#/board
 
     # via la base de données (schema geonetwork) :
+    # TODO il serait hautement préférable de passer par l'API REST que par la modification de la base de données de geonetwork
     # INSERT INTO geonetwork.operationallowed ( metadataid, groupid, operationid) VALUES ( '[METADATAID]', '1', '[OPERATIONID]');
     # (groupid=1 pour "Tous")
     # * Télécharger (operationid=1)
@@ -266,17 +253,17 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     # psql:/tmp/geosync_metadata/update_privilege.sql:1: ERREUR:  la valeur d'une clé dupliquée rompt la contrainte unique « operationallowed_pkey »
     # DÉTAIL : La clé « (groupid, metadataid, operationid)=(1, 485713, 1) » existe déjà.
 
+    # l'erreur psql: fe_sendauth: no password supplied
+    # peut être due à une erreur dans le user de la base de données de geonetwork, voir aussi le .pgpass
+
     sql_req = "set schema 'geonetwork';  INSERT INTO operationallowed SELECT 1, metadata.id, 1 FROM metadata WHERE data ILIKE '%" + name_layer_gs + "%' ; INSERT INTO operationallowed SELECT 1, metadata.id, 5 FROM metadata WHERE data ILIKE '%" + name_layer_gs + "%' ; INSERT INTO operationallowed SELECT 1, metadata.id, 0 FROM metadata WHERE data ILIKE '%" + name_layer_gs + "%' AND NOT EXISTS (SELECT * FROM operationallowed JOIN metadata ON operationallowed.metadataid = metadata.id WHERE data ILIKE '%" + name_layer_gs + "%' AND operationid = 0) ; "
 
-    print "sql_req :", sql_req 
+    print sql_req 
     sql_file_name = tmpdir + "/update_privilege.sql"
     sql_file = open(sql_file_name,"w")
     sql_file.write(sql_req)
     sql_file.close()
-    cmd = "psql -h " + database_hostname + " -d georchestra -U geonetwork -w -a -f " + sql_file_name
-    if verbose:
-                print "sql cmd :", cmd
-    #os.system(cmd)
+    os.system("psql -h " + database_hostname + " -d georchestra -U geonetwork -w -a -f " + sql_file_name)
 
 # test de la fonction publish_2_gn
 if __name__ == "__main__":

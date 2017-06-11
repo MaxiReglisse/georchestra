@@ -46,6 +46,7 @@ services:
     depends_on:
       - ldap
       - database
+      - geoserver
     environment:
       - TZ=Europe/Paris
       - SERVER_URL=https://georchestra-docker.umrthema.univ-fcomte.fr
