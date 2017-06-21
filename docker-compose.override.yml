@@ -47,6 +47,7 @@ services:
       - ldap
       - database
       - geoserver
+      - geonetwork
     environment:
       - TZ=Europe/Paris
       - SERVER_URL=https://georchestra-docker.umrthema.univ-fcomte.fr
@@ -60,6 +61,7 @@ services:
     volumes:
       - /dev/fuse:/dev/fuse
       - ./docker/ssl/DigiCertCA.crt:/usr/local/share/ca-certificates/DigiCertCA.crt:ro
+      - geosync_home:/home
     extra_hosts:
       #- "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.138"
       - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"

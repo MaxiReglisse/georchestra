@@ -205,6 +205,7 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
     #csw = CatalogueServiceWeb('https://georchestra-dev.umrthema.univ-fcomte.fr/geonetwork/srv/fre/csw-publication', skip_caps=True, username='testadmin', password='testadmin')
     
     # suppression des métadonnées relatives à la même couche geoserver
+    print "suppression de" + name_layer_gs
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike
     myquery = PropertyIsEqualTo('csw:AnyText',name_layer_gs)
     csw.getrecords2(constraints=[myquery], maxrecords=10)
