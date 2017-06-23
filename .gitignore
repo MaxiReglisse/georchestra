@@ -13,4 +13,6 @@ PostTreatment.groovy
 .idea/
 *.iml
 ./docker/ssl/*univ-fcomte_fr*
+./docker-compose.override.yml
+./docker-compose.yml
 
