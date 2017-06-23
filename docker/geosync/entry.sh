@@ -27,7 +27,7 @@ if [ ! -d /var/log/georchestra-ouvert ]; then
     ln -s /var/log/georchestra-ouvert    /home/georchestra-ouvert/log
     ln -s /var/log/georchestra-restreint /home/georchestra-restreint/log
 
-    echo "setting server url in .geosync.conf
+    echo "setting server url in .geosync.conf"
     perl -p -i -e "s|SERVER_URL|$SERVER_URL|" /home/georchestra-ouvert/.geosync.conf
     perl -p -i -e "s|SERVER_URL|$SERVER_URL|" /home/georchestra-restreint/.geosync.conf
 
