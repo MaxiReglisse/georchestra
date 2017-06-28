@@ -71,7 +71,6 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
             print str(saxon_output)
             # saxonb-xslt requiert le package libsaxonb-java (apt install libsaxonb-java)
             cmd = "saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output
-            # subprocess.call(["saxonb-xslt", "-ext:on", saxon_input, saxon_xsl, saxon_output]) # semble poser problème selon l'environnement (docker, ansible...)
             if verbose:
                 print "saxonb cmd :", cmd
             subprocess.call(cmd)
@@ -122,7 +121,7 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
             print element_MD_dist.appendChild(element_transfert)
             print element_transfert.appendChild(element_digital)
  
-    # AJOUT DES NOEUDS DANS L'ARBRE !!!!
+    # AJOUT DES NOEUDS DANS L'ARBRE
     # pour faire apparaître le bouton "Visualiser" dans geonetwork
     # dans <gmd:MD_DigitalTransferOptions>
     # <gmd:onLine>
@@ -180,14 +179,14 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
 
     print b_DigitalTransferOptions
  
-    for element in doc.getElementsByTagName(b_DigitalTransferOptions):
-        print element.appendChild(element_online)
-        print element_online.appendChild(element_ressource)
-        print element_ressource.appendChild(element_linkage)
-        print element_linkage.appendChild(element_url)
-        print element_ressource.appendChild(element_protocol)
-        print element_ressource.appendChild(element_name)
-        print element_ressource.appendChild(element_descr)
+    #for element in doc.getElementsByTagName(b_DigitalTransferOptions):
+    #    print element.appendChild(element_online)
+    #    print element_online.appendChild(element_ressource)
+    #    print element_ressource.appendChild(element_linkage)
+    #    print element_linkage.appendChild(element_url)
+    #    print element_ressource.appendChild(element_protocol)
+    #    print element_ressource.appendChild(element_name)
+    #    print element_ressource.appendChild(element_descr)
 
     input_csw = tmpdir + "/csw_" +  output
     output_fic = open(input_csw,'w') 
@@ -217,8 +216,8 @@ def publish_2_gn(input, url, login, password, workspace, database_hostname, verb
    
     # Transaction: insert
     #typename_csw = gmd + 'MD_Metadata' # FAIT PLUS HAUT, JUSTE APRES DETERMINATION GMD OU PAS
-    #print typename_csw
-    print input_csw
+    print "typename_csw " + typename_csw
+    print "input_csw " + input_csw
 
     #import unicodedata
     #acc = open(input_csw).read()

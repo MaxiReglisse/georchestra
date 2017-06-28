@@ -22,7 +22,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.backend=sp"
-      #- "traefik.frontend.rule=Host:georchestra-dev.umrthema.univ-fcomte.fr"
+     #- "traefik.frontend.rule=Host:georchestra-dev.umrthema.univ-fcomte.fr"
       - "traefik.frontend.rule=Host:georchestra-docker.umrthema.univ-fcomte.fr"
       - "traefik.frontend.passHostHeader=true"
 
