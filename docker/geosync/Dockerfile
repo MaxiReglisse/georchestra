@@ -22,9 +22,8 @@ RUN apt-get update && \
     apt-get install -y cron python
 
 # install other packages
-RUN apt-get install -y davfs2 fuse rsync curl
-RUN apt-get install -y python-dev python-pip python-lxml libxml2-utils gdal-bin postgis libsaxonb-java dbview
-RUN pip install owslib
+RUN apt-get install -y davfs2 fuse rsync curl ca-certificates
+RUN apt-get install -y python-dev python-owslib python-lxml libxml2-utils gdal-bin postgis libsaxonb-java dbview
 
 # install debug tools packages
 RUN apt-get install -y colordiff less vim openssh-client
