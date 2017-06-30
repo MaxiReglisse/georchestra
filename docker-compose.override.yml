@@ -16,7 +16,7 @@ services:
       - ./docker/ssl:/etc/traefik/ssl/
       - /dev/null:/traefik.toml
     #command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-dev_umrthema.univ-fcomte.fr.crt,/etc/traefik/ssl/georchestra-dev.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
-    command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-test_umrthema_univ-fcomte_fr.crt,/etc/traefik/ssl/georchestra-test.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
+    #command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-test_umrthema_univ-fcomte_fr.crt,/etc/traefik/ssl/georchestra-test.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
     command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-docker_umrthema_univ-fcomte_fr.crt,/etc/traefik/ssl/georchestra-docker.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
 
   proxy:
