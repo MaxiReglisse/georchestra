@@ -12,5 +12,5 @@ PostTreatment.groovy
 **/.settings
 .idea/
 *.iml
-./docker/ssl/*univ-fcomte_fr*
+./docker/ssl/*univ-fcomte*
 
