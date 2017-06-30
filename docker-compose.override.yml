@@ -69,4 +69,3 @@ services:
       - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
       - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.124"
-
