@@ -15,3 +15,4 @@ done
 # Recompute indexes (on a stopped service ONLY)
 slapindex -b ${dc_string}
 echo "LDAP indexed"
+
