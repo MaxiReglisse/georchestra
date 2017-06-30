@@ -27,6 +27,10 @@ if [ ! -d /var/log/georchestra-ouvert ]; then
     ln -s /var/log/georchestra-ouvert    /home/georchestra-ouvert/log
     ln -s /var/log/georchestra-restreint /home/georchestra-restreint/log
 
+    echo "setting server url in .geosync.conf"
+    perl -p -i -e "s|SERVER_URL|$SERVER_URL|" /home/georchestra-ouvert/.geosync.conf
+    perl -p -i -e "s|SERVER_URL|$SERVER_URL|" /home/georchestra-restreint/.geosync.conf
+
     echo "Initializing geosync"
     su georchestra-ouvert    -c '/usr/local/geosync/bin/init_data.sh'
     su georchestra-restreint -c '/usr/local/geosync/bin/init_data.sh'
