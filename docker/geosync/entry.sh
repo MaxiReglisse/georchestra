@@ -39,5 +39,14 @@ else
     echo "geosync already initialized !"
 fi
 
+# suppression des éventuels verrous
+echo "Removing davfs locks"
+if [ -e /var/run/mount.davfs/home-georchestra-ouvert-owncloud.pid  ]; then
+    rm -f /var/run/mount.davfs/home-georchestra-ouvert-owncloud.pid
+fi
+if [ -e /var/run/mount.davfs/home-georchestra-restreint-owncloud.pid  ]; then
+    rm -f /var/run/mount.davfs/home-georchestra-restreint-owncloud.pid
+fi
+
 exec $@
 
