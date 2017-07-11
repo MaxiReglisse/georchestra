@@ -40,7 +40,8 @@ services:
     ports:
       - "2222:22"
     volumes:
-      - geoserver_geodata:/mnt/geoserver_geodata
+      #- geoserver_geodata:/mnt/geoserver_geodata
+      - /srv/docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
 
   geosync:
     build: docker/geosync
