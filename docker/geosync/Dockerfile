@@ -64,8 +64,8 @@ RUN echo "https://owncloud-mshe.univ-fcomte.fr/owncloud/remote.php/webdav /home/
 # add geosync source code
 COPY geosync /usr/local/geosync
 
-#RUN mkdir /var/log/geosync
-#RUN chown georchestra-ouvert:geosync  /var/log/geosync
+# on expose le volume /home... c'est utile/inutile ??
+VOLUME /home
 
 # entrypoint
 COPY entry.sh /

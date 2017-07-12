@@ -10,6 +10,7 @@ volumes:
   mapfishapp_uploads:
   extractorapp_extracts:
   geonetwork_datadir:
+  geosync_home:
 
 services:
   database:

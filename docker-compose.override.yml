@@ -65,6 +65,8 @@ services:
     volumes:
       - /dev/fuse:/dev/fuse
       - ./docker/ssl/DigiCertCA.crt:/usr/local/share/ca-certificates/DigiCertCA.crt:ro
+      - geosync_home:/home
+      #- /srv/docker/georchestra/geosync_home:/home
     extra_hosts:
       - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
