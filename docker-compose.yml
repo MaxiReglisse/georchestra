@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 volumes:
   postgresql_data:
@@ -10,7 +10,10 @@ volumes:
   mapfishapp_uploads:
   extractorapp_extracts:
   geonetwork_datadir:
-  geosync_home:
+  geosync_ouvert_home:
+  geosync_ouvert_mnt:
+  geosync_restreint_home:
+  geosync_restreint_mnt:
 
 services:
   database:
