@@ -15,4 +15,4 @@ PostTreatment.groovy
 ./docker/ssl/*univ-fcomte*
 **/secrets
 **/.geosync.conf
-
+**/.pgpass
