@@ -13,4 +13,6 @@ PostTreatment.groovy
 .idea/
 *.iml
 ./docker/ssl/*univ-fcomte*
-
+**/secrets
+**/.geosync.conf
+**/.pgpass
