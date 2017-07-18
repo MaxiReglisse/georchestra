@@ -41,6 +41,8 @@ RUN chmod 600 /home/georchestra-ouvert/.davfs2/secrets
 RUN chmod 600 /home/georchestra-ouvert/.pgpass
 RUN chown -R georchestra-ouvert:geosync /home/georchestra-ouvert
 RUN adduser georchestra-ouvert crontab
+RUN mkdir -p /mnt/georchestra-ouvert/owncloudsync
+RUN chown -R georchestra-ouvert:geosync /mnt/georchestra-ouvert
 
 # add geosync user georchestra-restreint
 ADD georchestra-restreint /home/georchestra-restreint
@@ -52,6 +54,8 @@ RUN chmod 600 /home/georchestra-restreint/.davfs2/secrets
 RUN chmod 600 /home/georchestra-restreint/.pgpass
 RUN chown -R georchestra-restreint:geosync /home/georchestra-restreint
 RUN adduser georchestra-restreint crontab
+RUN mkdir -p /mnt/georchestra-restreint/owncloudsync
+RUN chown -R georchestra-restreint:geosync /mnt/georchestra-restreint
 
 # configure webdav
 RUN chmod u+s /sbin/mount.davfs
