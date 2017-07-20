@@ -15,22 +15,25 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./docker/ssl:/etc/traefik/ssl/
       - /dev/null:/traefik.toml
-    #command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-dev_umrthema.univ-fcomte.fr.crt,/etc/traefik/ssl/georchestra-dev.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
+    #command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-dev_umrthema_univ-fcomte_fr.crt,/etc/traefik/ssl/georchestra-dev.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
     #command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-test_umrthema_univ-fcomte_fr.crt,/etc/traefik/ssl/georchestra-test.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
     command: --web --docker --logLevel=INFO --docker.domain='umrthema.univ-fcomte.fr' --docker.exposedbydefault='false' --docker.watch --entryPoints='Name:https Address::443 TLS:/etc/traefik/ssl/georchestra-docker_umrthema_univ-fcomte_fr.crt,/etc/traefik/ssl/georchestra-docker.umrthema.univ-fcomte.fr.key' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultentrypoints=http,https
+    restart: always
 
   proxy:
     labels:
       - "traefik.enable=true"
       - "traefik.backend=sp"
       #- "traefik.frontend.rule=Host:georchestra-dev.umrthema.univ-fcomte.fr"
-      - "traefik.frontend.rule=Host:georchestra-test.umrthema.univ-fcomte.fr"
+      #- "traefik.frontend.rule=Host:georchestra-test.umrthema.univ-fcomte.fr"
       - "traefik.frontend.rule=Host:georchestra-docker.umrthema.univ-fcomte.fr"
       - "traefik.frontend.passHostHeader=true"
+    restart: always
 
   smtp:
     build: docker/smtp/smtp-sink
     image: camptocamp/smtp-sink:latest
+    restart: always
 
   geodata:
     build: docker/ssh_data
@@ -42,6 +45,7 @@ services:
     volumes:
       #- geoserver_geodata:/mnt/geoserver_geodata
       - /docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
+    restart: always
 
   geosync:
     build: docker/geosync
@@ -72,6 +76,8 @@ services:
       #- geosync_restreint_mnt:/mnt/georchestra-restreint
       - /docker/georchestra/geosync_restreint_mnt:/mnt/georchestra-restreint
     extra_hosts:
-      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"
+      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.138"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
       - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.124"
+    restart: always
+
