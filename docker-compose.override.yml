@@ -41,7 +41,7 @@ services:
       - "2222:22"
     volumes:
       #- geoserver_geodata:/mnt/geoserver_geodata
-      - /srv/docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
+      - /docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
 
   geosync:
     build: docker/geosync
@@ -67,10 +67,10 @@ services:
       - ./docker/ssl/DigiCertCA.crt:/usr/local/share/ca-certificates/DigiCertCA.crt:ro
       - geosync_ouvert_home:/home/georchestra-ouvert
       #- geosync_ouvert_mnt:/mnt/georchestra-ouvert
-      - /srv/docker/georchestra/geosync_ouvert_mnt:/mnt/georchestra-ouvert
+      - /docker/georchestra/geosync_ouvert_mnt:/mnt/georchestra-ouvert
       - geosync_restreint_home:/home/georchestra-restreint
       #- geosync_restreint_mnt:/mnt/georchestra-restreint
-      - /srv/docker/georchestra/geosync_restreint_mnt:/mnt/georchestra-restreint
+      - /docker/georchestra/geosync_restreint_mnt:/mnt/georchestra-restreint
     extra_hosts:
       - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"

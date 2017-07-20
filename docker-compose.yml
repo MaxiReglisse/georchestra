@@ -28,7 +28,7 @@ services:
       - POSTGRES_PASSWORD=georchestra
     volumes:
       #- postgresql_data:/var/lib/postgresql/data
-      - /srv/docker/georchestra/postgresql_data:/var/lib/postgresql/data
+      - /docker/georchestra/postgresql_data:/var/lib/postgresql/data
 
   ldap:
     image: mshe/ldap
@@ -42,7 +42,7 @@ services:
         - SLAPD_ADDITIONAL_MODULES=groupofmembers
     volumes:
       #- ldap_data:/var/lib/ldap
-      - /srv/docker/georchestra/ldap_data:/var/lib/ldap
+      - /docker/georchestra/ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap
     extra_hosts:
       - "thema-serv3.umrthema.univ-fcomte.fr:172.20.74.170"
@@ -56,9 +56,9 @@ services:
       - ldap
     volumes:
       #- geoserver_datadir:/mnt/geoserver_datadir
-      - /srv/docker/georchestra/geoserver_datadir:/mnt/geoserver_datadir
+      - /docker/georchestra/geoserver_datadir:/mnt/geoserver_datadir
       #- geoserver_geodata:/mnt/geoserver_geodata
-      - /srv/docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
+      - /docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
       - geoserver_tiles:/mnt/geoserver_tiles
     environment:
       - TZ=Europe/Paris
