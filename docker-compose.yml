@@ -28,7 +28,8 @@ services:
       - POSTGRES_PASSWORD=georchestra
     volumes:
       #- postgresql_data:/var/lib/postgresql/data
-      - /srv/docker/georchestra/postgresql_data:/var/lib/postgresql/data
+      - /docker/georchestra/postgresql_data:/var/lib/postgresql/data
+    restart: always
 
   ldap:
     image: mshe/ldap
@@ -42,10 +43,11 @@ services:
         - SLAPD_ADDITIONAL_MODULES=groupofmembers
     volumes:
       #- ldap_data:/var/lib/ldap
-      - /srv/docker/georchestra/ldap_data:/var/lib/ldap
+      - /docker/georchestra/ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap
     extra_hosts:
       - "thema-serv3.umrthema.univ-fcomte.fr:172.20.74.170"
+    restart: always
 
   geoserver:
     image: mshe/geoserver
@@ -56,21 +58,22 @@ services:
       - ldap
     volumes:
       #- geoserver_datadir:/mnt/geoserver_datadir
-      - /srv/docker/georchestra/geoserver_datadir:/mnt/geoserver_datadir
+      - /docker/georchestra/geoserver_datadir:/mnt/geoserver_datadir
       #- geoserver_geodata:/mnt/geoserver_geodata
-      - /srv/docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
+      - /docker/georchestra/geoserver_geodata:/mnt/geoserver_geodata
       - geoserver_tiles:/mnt/geoserver_tiles
     environment:
       - TZ=Europe/Paris
       #- SERVER_URL=https://georchestra-docker.umrthema.univ-fcomte.fr
-      - SERVER_URL=https://georchestra-test.umrthema.univ-fcomte.fr
-      #- SERVER_URL=https://georchestra-dev.umrthema.univ-fcomte.fr
+      #- SERVER_URL=https://georchestra-test.umrthema.univ-fcomte.fr
+      - SERVER_URL=https://georchestra-dev.umrthema.univ-fcomte.fr
       - XMS=256M
       - XMX=8G
     extra_hosts:
-      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"
+      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.138"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
       - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.124"
+    restart: always
 
   proxy:
     image: georchestra/security-proxy:latest
@@ -83,9 +86,10 @@ services:
       - XMS=256M
       - XMX=1G
     extra_hosts:
-      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.124"
+      - "georchestra-dev.umrthema.univ-fcomte.fr:172.20.74.138"
       - "georchestra-test.umrthema.univ-fcomte.fr:172.20.74.83"
       - "georchestra-docker.umrthema.univ-fcomte.fr:172.20.74.124"
+    restart: always
 
   cas:
     image: georchestra/cas:latest
@@ -96,6 +100,7 @@ services:
     environment:
       - XMS=256M
       - XMX=1G
+    restart: always
 
   mapfishapp:
     image: georchestra/mapfishapp:latest
@@ -107,6 +112,7 @@ services:
     environment:
       - XMS=256M
       - XMX=2G
+    restart: always
 
   extractorapp:
     image: georchestra/extractorapp:latest
@@ -118,6 +124,7 @@ services:
     environment:
       - XMS=256M
       - XMX=2G
+    restart: always
 
   header:
     image: georchestra/header:latest
@@ -126,6 +133,7 @@ services:
     environment:
       - XMS=256M
       - XMX=512M
+    restart: always
 
   ldapadmin:
     image: georchestra/ldapadmin:latest
@@ -137,6 +145,7 @@ services:
     environment:
       - XMS=256M
       - XMX=1G
+    restart: always
 
   geonetwork:
     image: georchestra/geonetwork:3-latest
@@ -149,6 +158,7 @@ services:
     environment:
       - XMS=256M
       - XMX=6G
+    restart: always
 
   analytics:
     image: georchestra/analytics:latest
@@ -159,3 +169,6 @@ services:
     environment:
       - XMS=256M
       - XMX=1G
+    restart: always
+
+
