@@ -1,32 +1,10 @@
-# ge@sync / geOrchestra
+ * a [docker composition](https://github.com/georchestra/docker/blob/master/docker-compose.yml), which pulls pre-built images from [docker hub](https://hub.docker.com/u/georchestra/), is perfect for a quick start. Provided you have a good download speed and recent machine (8Gb required), you'll be up and running within 10 minutes. Read [how to run geOrchestra on Docker](https://github.com/georchestra/docker/blob/master/README.md) here.
+ * a contributed [ansible playbook](https://github.com/georchestra/ansible) allows you to spin an instance in a few minutes. This is probably the easiest way to create a small production server, since it takes care of installing the middleware, fetching the webapps and configuring them.
+ * generic [debian (or yum) packages](https://packages.georchestra.org/) are perfect to create complex architectures, but you'll have to [install and configure the middleware](docs/setup.md) first.
+ * you could also use the [generic wars](https://packages.georchestra.org/wars-master/) with their "[datadir](https://github.com/georchestra/datadir)", as an alternate method. The above packages provide both.
+ * finally, [building from the sources](docs/build.md) is the most flexible solution, since it allows you to customize the webapps very deeply. You get custom WAR files, packages or docker images that you can [deploy](docs/deploy.md) to dev, test, or production servers. 
 
-[ge@sync](https://github.com/MSHE-Ledoux/geosync) permet la publication automatique sur geOrchestra de données déposées et partagées sur OwnCloud.
-
-georchestra-geosync est un fork du projet [geOrchestra](https://github.com/georchestra/georchestra), dans lequel 3 conteneurs Docker sont modifiés :
-
-- ### ldap.mshe
-
-Intégration des données d'un annuaire Active Directory pour gérer les utilisateurs, utilisation du démon saslauth pour que l'annuaire LDAP de geOrchestra interroge l'AD pour authentifier les utilisateurs.
-
-- ### postgresql.mshe
-
-Création des bases de données nécessaires à ge@sync ; création de l'utilisateur geosync ; 
-modification de pg_hba.conf pour permettre les accès aux bases de données depuis les réseaux locaux.
-
-- ### geoserver/webapp/src/docker.mshe
-
-Création des espaces de travail des utilisateurs georchestra-ouvert et georchestra-restreint
-
-## Création d'un nouveau conteneur : geosync
-
-- ### docker/geosync
-
-Il contient les homes des utilisateurs virtuels georchestra-ouvert et georchestra-restreints, dans lesquels seront synchronisées les données en provenance de OwnCloud.
-
-Le code de geosync est installé dans /usr/local/geosync/bin.
-
-Les logs sont accessibles depuis les répertoires des utilisateurs virtuels.
-
-Un cron est démarré dès le lancement du conteneur.
-
+If you opt for the middleware setup by yourself, there are several [optimizations](docs/optimizations.md), [good practices](docs/good_practices.md) and [tutorials](docs/tutorials.md) that are worth reading. 
+Note that the minimum system requirement is 2 cores and 4Gb RAM, but we recommend at least 4 cores and 8 Gb RAM for a production instance.
+More RAM is of course better !
 
