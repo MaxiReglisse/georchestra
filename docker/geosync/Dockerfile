@@ -36,10 +36,11 @@ ADD georchestra-ouvert /home/georchestra-ouvert
 RUN useradd -s /bin/bash \
             -p $(echo "print crypt("${GEO_USER_PASS:-password}", "salt")" | perl) \
             --uid 992 --gid 991 georchestra-ouvert
+RUN chown -R georchestra-ouvert:geosync /home/georchestra-ouvert
+RUN mkdir /home/georchestra-ouvert/owncloud
 RUN rm -rf /home/georchestra-ouvert/.davfs2/cache
 RUN chmod 600 /home/georchestra-ouvert/.davfs2/secrets
 RUN chmod 600 /home/georchestra-ouvert/.pgpass
-RUN chown -R georchestra-ouvert:geosync /home/georchestra-ouvert
 RUN adduser georchestra-ouvert crontab
 RUN mkdir -p /mnt/georchestra-ouvert/owncloudsync
 RUN chown -R georchestra-ouvert:geosync /mnt/georchestra-ouvert
@@ -49,10 +50,11 @@ ADD georchestra-restreint /home/georchestra-restreint
 RUN useradd -s /bin/bash \
             -p $(echo "print crypt("${GEO_USER_PASS:-password}", "salt")" | perl) \
             --uid 993 --gid 991 georchestra-restreint
+RUN chown -R georchestra-restreint:geosync /home/georchestra-restreint
+RUN mkdir /home/georchestra-restreint/owncloud
 RUN rm -rf /home/georchestra-restreint/.davfs2/cache
 RUN chmod 600 /home/georchestra-restreint/.davfs2/secrets
 RUN chmod 600 /home/georchestra-restreint/.pgpass
-RUN chown -R georchestra-restreint:geosync /home/georchestra-restreint
 RUN adduser georchestra-restreint crontab
 RUN mkdir -p /mnt/georchestra-restreint/owncloudsync
 RUN chown -R georchestra-restreint:geosync /mnt/georchestra-restreint
