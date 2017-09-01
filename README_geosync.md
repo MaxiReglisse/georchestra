@@ -19,9 +19,8 @@ Création des espaces de travail des utilisateurs georchestra-ouvert et georches
 
 ## Création d'un nouveau conteneur : geosync
 
-- ### docker/geosync
+- ### geosync
 
-<<<<<<< HEAD
 Il contient les homes des utilisateurs virtuels georchestra-ouvert et georchestra-restreints, dans lesquels seront synchronisées les données en provenance de OwnCloud.
 
 Le code de geosync est installé dans /usr/local/geosync/bin.
