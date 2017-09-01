@@ -50,7 +50,7 @@ services:
     restart: always
 
   geosync:
-    build: docker/geosync
+    build: geosync
     image: mshe/geosync
     depends_on:
       - ldap
