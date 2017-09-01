@@ -1,7 +1,0 @@
-ces fichiers sont ignorés par .gitignore quand on publie sur github
-prévoir des équivalents de type sample, banalisés, qui seront publés.
-
-/home/georchestra/georchestra/docker/geosync/georchestra-ouvert/.pgpass
-/home/georchestra/georchestra/docker/geosync/georchestra-ouvert/.geosync.conf
-/home/georchestra/georchestra/docker/geosync/georchestra-ouvert/.davfs2/secrets
-
