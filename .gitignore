@@ -16,3 +16,4 @@ PostTreatment.groovy
 **/secrets
 **/.geosync.conf
 **/.pgpass
+**/dot.ldap.conf
